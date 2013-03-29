@@ -1,0 +1,7 @@
+en:
+  vagrant_mongodb:
+    errors:
+      initiate: "Failed to initiate replica set"
+    actions:
+      replset_initiate:
+        initiate: "Initiating replica set '%{name}'"

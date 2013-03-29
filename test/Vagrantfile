@@ -1,0 +1,33 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure('2') do |config|
+  config.vm.box = 'precise64'
+  config.vm.box_url = 'http://files.vagrantup.com/precise64.box'
+
+  config.mongodb.replset :rs0 do |rs|
+    rs.member :server1, :priority => 1
+    rs.member :server2, :priority => 2
+    rs.member :server3, :priority => 1
+  end
+
+  script = <<-SCRIPT
+    apt-get -y install mongodb
+    echo 'replSet=rs0' >> /etc/mongodb.conf
+    sed -in '/^bind_ip/d' /etc/mongodb.conf
+    service mongodb restart
+  SCRIPT
+  config.vm.provision :shell, :inline => script
+
+  config.vm.define :server1 do |server|
+    server.vm.network :private_network, :ip => '10.0.5.2'
+  end
+
+  config.vm.define :server2 do |server|
+    server.vm.network :private_network, :ip => '10.0.5.3'
+  end
+
+  config.vm.define :server3 do |server|
+    server.vm.network :private_network, :ip => '10.0.5.4'
+  end
+end
