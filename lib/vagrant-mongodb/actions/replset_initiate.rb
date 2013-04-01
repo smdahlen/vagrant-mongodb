@@ -15,16 +15,17 @@ module VagrantPlugins
         def call(env)
           @app.call(env)
 
-          # check if the current machine is a member of a replica set
+          # check if the current machine is a member of a replica set and the
+          # replica set has not already been initiated
           @logger.info "Checking if '#{@machine.name}' is part of a replica set..."
           rs = get_replset(@machine.name) if @config
-          return if !rs
+          return if !rs or already_initiated?(rs)
 
           # ensure all members are available before initiating replica set
           if all_members_available?(rs)
             env[:ui].info @translator.t('initiate', { :name => rs.name })
             command = "mongo --eval 'printjson(rs.initiate(#{generate_json(rs)}))'"
-            env[:machine].communicate.execute(command) do |type, data|
+            @machine.communicate.execute(command) do |type, data|
               raise Errors::ReplSetInitiateError if data =~ /"ok" : 0/
             end
           end
@@ -91,6 +92,19 @@ module VagrantPlugins
           end
 
           ip || machine.ssh_info[:host]
+        end
+
+        # check if the replica set has already been initiated
+        def already_initiated?(rs)
+          @logger.info "Checking if '#{rs.name}' has already been initiated..."
+          command = "mongo --eval 'printjson(rs.status())'"
+          begin
+            @machine.communicate.execute(command) do |type, data|
+              return true if data =~ /"ok" : 1/
+            end
+          rescue Vagrant::Errors::VagrantError
+          end
+          false
         end
       end
     end

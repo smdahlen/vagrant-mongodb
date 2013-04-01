@@ -9,17 +9,20 @@ module VagrantPlugins
         This plugin manages a MongoDb replica set.
       DESC
 
+      def self.replset_initiate(hook)
+        setup_logging
+        setup_i18n
+        hook.before(Vagrant::Action::Builtin::Provision, Actions::ReplSetInitiate)
+      end
+
       config(:mongodb) do
         require_relative 'config'
         Config
       end
 
       # initiate replica set after machine provisioning
-      action_hook(:replset_initiate, :machine_action_up) do |hook|
-        setup_logging
-        setup_i18n
-        hook.before(Vagrant::Action::Builtin::Provision, Actions::ReplSetInitiate)
-      end
+      action_hook(:replset_initiate, :machine_action_provision, &method(:replset_initiate))
+      action_hook(:replset_initiate, :machine_action_up, &method(:replset_initiate))
 
       def self.setup_i18n
         I18n.load_path << File.expand_path(

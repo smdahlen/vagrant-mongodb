@@ -20,9 +20,12 @@ module VagrantPlugins
       end
 
       def replset(name, &block)
-        rs = ReplSet.new(name)
+        rs = @replsets.find { |r| r.name == name.to_sym }
+        if !rs
+          rs = ReplSet.new(name)
+          @replsets << rs
+        end
         block.call(rs)
-        @replsets << rs
       end
 
       class ReplSet
@@ -30,12 +33,17 @@ module VagrantPlugins
         attr_reader :members
 
         def initialize(name)
-          @name = name
+          @name = name.to_sym
           @members = []
         end
 
         def member(name, options = {})
-          @members << options.merge({ :_id => @members.size, :host => name})
+          member = @members.find { |m| m[:host] == name.to_sym }
+          if member
+            member.merge(options)
+          else
+            @members << options.merge({ :_id => @members.size, :host => name.to_sym })
+          end
         end
       end
     end
