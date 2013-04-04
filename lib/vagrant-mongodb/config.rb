@@ -5,18 +5,29 @@ module VagrantPlugins
 
       def initialize
         @replsets = []
+        @translator = Helpers::Translator.new('config')
       end
 
-      # Override default merge behavior
+      # override default merge behavior
       # TODO look into merge strategy
       def merge(other)
         return self
       end
 
       def validate(machine)
-        # TODO check that member names have a matching vm definition
-        # TODO check that each replica set has 3+ members
-        # TODO warn if replica set has even number of members
+        errors = []
+        @replsets.each do |rs|
+          if rs.members.size < 3
+            errors << @translator.t('replset_size', { :name => rs.name })
+          end
+          rs.members.each do |m|
+            if !machine.env.machine_names.find { |name| name == m[:host] }
+              errors << @translator.t('unknown_member', { :member => m[:host] })
+            end
+          end
+        end
+
+        { 'MongoDb' => errors }
       end
 
       def replset(name, &block)
@@ -40,7 +51,7 @@ module VagrantPlugins
         def member(name, options = {})
           member = @members.find { |m| m[:host] == name.to_sym }
           if member
-            member.merge(options)
+            member.merge!(options)
           else
             @members << options.merge({ :_id => @members.size, :host => name.to_sym })
           end

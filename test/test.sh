@@ -1,6 +1,3 @@
-gem build *.gemspec
-vagrant plugin install vagrant-mongodb
-
 cd test
 
 vagrant up

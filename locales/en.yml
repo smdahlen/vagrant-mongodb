@@ -2,6 +2,9 @@ en:
   vagrant_mongodb:
     errors:
       initiate: "Failed to initiate replica set"
+    config:
+      replset_size: "'%{name}' replica set requires a minimum of 3 members" 
+      unknown_member: "'%{member}' member is not defined"
     actions:
       replset_initiate:
         initiate: "Initiating replica set '%{name}'"
