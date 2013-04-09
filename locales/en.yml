@@ -3,8 +3,9 @@ en:
     errors:
       initiate: "Failed to initiate replica set"
     config:
-      replset_size: "'%{name}' replica set requires a minimum of 3 members" 
+      replica_set_size: "'%{name}' replica set requires a minimum of 3 members" 
       unknown_member: "'%{member}' member is not defined"
-    actions:
-      replset_initiate:
-        initiate: "Initiating replica set '%{name}'"
+    info:
+      checking: "Checking if replica set '%{name}' is ready..."
+      initiating: "Initiating replica set '%{name}'..."
+      initiated: "Replica set '%{name}' already initiated."    

@@ -5,7 +5,7 @@ module VagrantPlugins
         error_namespace("vagrant_mongodb.errors")
       end
 
-      class ReplSetInitiateError < MongoDbError
+      class InitiateError < MongoDbError
         error_key(:initiate)
       end
     end

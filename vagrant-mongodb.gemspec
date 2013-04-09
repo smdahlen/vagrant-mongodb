@@ -8,7 +8,10 @@ Gem::Specification.new do |gem|
   gem.version       = VagrantPlugins::MongoDb::VERSION
   gem.authors       = ['Shawn Dahlen']
   gem.email         = ['shawn@dahlen.me']
-  gem.description   = %q{A Vagrant plugin that manages a MongoDb replicaset}
+  gem.description   = <<-DESC
+                        A Vagrant plugin that supports the configuration
+                        and initation of a MongoDb replica set.
+                      DESC
   gem.homepage      = 'https://github.com/smdahlen/vagrant-mongodb'
   gem.summary       = gem.description
 
